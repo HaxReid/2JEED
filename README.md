@@ -1,6 +1,3 @@
-# bang2
+# 2JEED Casino
 
-![Java CI with Gradle](https://github.com/gedeffe/bang2/actions/workflows/gradle.yml/badge.svg?branch=supinfo_jee_2023_client_part)
-
-To share exercises for our java team ...
-
+An online casino with java ee (front and back)
