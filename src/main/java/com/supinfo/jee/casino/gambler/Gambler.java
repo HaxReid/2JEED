@@ -30,12 +30,14 @@ public class Gambler {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "gambler")
     private List<Party> partyList = new ArrayList<>();
 
+    public Gambler(String pseudoParam, String passwordParam) {
+        this.pseudo = pseudoParam;
+        this.password = passwordParam;
+    }
     public Gambler(String pseudoParam, String passwordParam, long balanceParam, int betParam) {
         this.pseudo = pseudoParam;
         this.password = passwordParam;
         this.balance = balanceParam;
         this.bet = betParam;
     }
-    
-
 }

@@ -13,7 +13,6 @@ public class GamblerManagerImpl implements GamblerManager {
 
     private final GamblerRepository gamblerRepository;
 
-
     @Override
     public Gambler getGambler(String pseudo) {
         final Gambler gambler;
@@ -29,6 +28,7 @@ public class GamblerManagerImpl implements GamblerManager {
         return gambler;
     }
 
+
     @Override
     public void authenticateGambler(String pseudo, String password) {
         if (StringUtils.hasText(pseudo)) {
@@ -41,6 +41,27 @@ public class GamblerManagerImpl implements GamblerManager {
             throw new EmptyPseudoException();
         }
     }
+
+    @Override
+    public Gambler register(String pseudo, String password) throws PseudoAlreadyExistsException, EmptyPasswordException {
+        final Gambler gambler;
+        if (StringUtils.hasText(pseudo)) {
+            if (StringUtils.hasText(password)) {
+                if (!this.gamblerRepository.existsByPseudo(pseudo)) {
+                    gambler = new Gambler(pseudo, password);
+                    this.gamblerRepository.save(gambler);
+                } else {
+                    throw new PseudoAlreadyExistsException(pseudo);
+                }
+            } else {
+                throw new EmptyPasswordException();
+            }
+        } else {
+            throw new EmptyPseudoException();
+        }
+        return gambler;
+    }
+
 
     private Optional<Gambler> retrieveGambler(String pseudo) {
         final Optional<Gambler> gamblerOptional;
@@ -81,13 +102,21 @@ public class GamblerManagerImpl implements GamblerManager {
             throw new WrongBetException();
         }
         Gambler gambler = this.retrieveGambler(pseudo).orElseThrow(EmptyPseudoException::new);
-
-        long newBalance = gambler.getBalance() - (long) bet * numberOfLaunch;
-        gambler.setBalance(newBalance);
+        for (int i = 0; i < numberOfLaunch; i++) {
+            if (gambler.getBalance() <= 0) {
+                throw new WrongBalanceException(gambler.getBalance(), pseudo);
+            }
+            int numberOfWin = 0;
+            gambler.setBalance(gambler.getBalance() - (long) bet);
+            int number = (int) (Math.random() * 100);
+            if (number <= initialValue && numberOfWin <= 5) {
+                gambler.setBalance(gambler.getBalance() + (long) bet * 100 / initialValue);
+                numberOfWin++;
+            }
+        }
         gambler = this.gamblerRepository.save(gambler);
-
-        if (newBalance < 1) {
-            throw new WrongBalanceException(newBalance, pseudo);
+        if (gambler.getBalance() < 1) {
+            throw new WrongBalanceException(gambler.getBalance(), pseudo);
         }
         return gambler;
     }

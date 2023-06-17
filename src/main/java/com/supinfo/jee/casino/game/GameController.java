@@ -1,7 +1,6 @@
 package com.supinfo.jee.casino.game;
 
-import com.supinfo.jee.casino.gambler.Gambler;
-import com.supinfo.jee.casino.gambler.GamblerManager;
+import com.supinfo.jee.casino.gambler.*;
 import com.supinfo.jee.casino.launches.LaunchController;
 import com.supinfo.jee.casino.launches.LaunchInputDto;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class GameController {
 
     private final GamblerManager gamblerManager;
+    private final GamblerRepository gamblerRepository;
 
     @PostMapping("/games")
     @ResponseStatus(HttpStatus.CREATED)
@@ -38,7 +38,11 @@ public class GameController {
 
     @PostMapping("/authenticates")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    void authenticate(@RequestBody GameInputDto newGame) {
-        this.gamblerManager.authenticateGambler(newGame.getPseudo(), newGame.getPassword());
+    void authenticate(@RequestBody GameInputDto newGame) throws EmptyPasswordException, PseudoAlreadyExistsException {
+        if (this.gamblerRepository.existsByPseudo(newGame.getPseudo())){
+            this.gamblerManager.authenticateGambler(newGame.getPseudo(), newGame.getPassword());
+        }else{
+            this.gamblerManager.register(newGame.getPseudo(), newGame.getPassword());
+        }
     }
 }

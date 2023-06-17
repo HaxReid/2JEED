@@ -65,7 +65,7 @@ public class SpringControllerAdvice {
     @ResponseBody
     @ExceptionHandler(WrongPasswordException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
-    String wrongBetHandler(WrongPasswordException ex) {
+    String wrongPasswordHandler(WrongPasswordException ex) {
         return ex.getMessage();
     }
 }
